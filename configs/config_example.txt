@@ -1,0 +1,84 @@
+{
+    "name": "BERT",                                                     # Training session name, name for saves.
+    "n_gpu": 1,                                                         # Number of gpu's to use for training.
+    "arch": {
+        "type": "bert_baseModel",                                       # Name of model architecture to train.
+        "args": {                                                       
+            "model": "bert-base-uncased",                               # Name of model to use.
+            "hidden_size": 768,                                         # Size of hidden layer.
+            "num_class": 469                                            # Number of classes.
+        }
+    },
+    "data_loader": {                                                    # Training data loader.
+        "type": "Papers",                                               # Selecting data loader.    
+        "args": {
+            "dir": "/Dataset/Complete/data_pymed_train.csv",            # Dataset path.     
+            "data_dir": "/Dataset/Complete/data_pymed_train.csv",       # Dataset path for training.
+            "batch_size": 16,                                           # Batch size.
+            "type": "bert-base",                                        # Embedding type.
+            "model": "bert-base-uncased",                               # Model name.
+            "num_classes": 469,                                         # Number of classes.
+            "shuffle": true,                                            # Shuffle training data.
+            "validation_split": 0.0,                                    # 0 Validation, we have our own valdiation set                                                    
+            "num_workers": 2,                                           
+            "max_length": 512                                           # Max length of input.
+        }
+    },
+    "valid_data_loader": {                                              # Validation data loader.
+        "type": "Papers",                                                   
+        "args": {
+            "dir": "/Dataset/Complete/data_pymed_train.csv",
+            "data_dir": "/Dataset/Complete/data_pymed_val.csv",         # Dataset path for validation.        
+            "batch_size": 16,
+            "type": "bert-base",
+            "model": "bert-base-uncased",
+            "num_classes": 469,
+            "shuffle": true,
+            "validation_split": 0.0,
+            "num_workers": 2,
+            "max_length": 512
+        }
+    },
+    "optimizer": {                                                      # Optimizer.
+        "type": "AdamW",                                                # Optimizer type.
+        "args": {                                                       # Optimizer arguments.
+            "lr": 2e-05
+        }
+    },
+    "loss": "cross_entropy",                                            # Loss function.                            
+    "metrics": [                                                        # List of metrics to evaluate.
+        "accuracy",
+        "top_3_acc",
+        "top_5_acc",
+        "top_10_acc"
+    ],
+    "lr_scheduler": {                                                   # Learning rate scheduler.
+        "type": "OneCycleLR",
+        "args": {
+            "max_lr": 2e-05,
+            "epochs": 5,
+            "steps_per_epoch":9847,
+            "div_factor": 2.5,
+            "pct_start": 0.1,
+            "anneal_strategy": "linear"
+        }
+    },
+    "trainer": {                                                        # Trainer.
+        "epochs": 5,
+        "save_dir": "saved/",                                           
+        "save_period": 1,                                               # Save checkpoints every save_freq epochs.
+        "verbosity": 2,                                                 # 0: quiet, 1: per epoch, 2: full
+        "monitor": "min val_loss",                                      # Mode and metric for model performance monitoring. set 'off' to disable.
+        "early_stop": 3,                                                # Number of epochs to wait before early stop. set 0 to disable.
+        "tensorboard": true
+    }
+}
+
+# TRAIN
+python train.py --config configs/config_bert_gnn_final.json
+
+# RESUME CHECKPOINT
+python train.py --resume path/to/checkpoint
+
+# TEST 
+python test.py --resume path/to/checkpoint

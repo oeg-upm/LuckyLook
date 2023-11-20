@@ -1,0 +1,76 @@
+{
+    "name": "csRoBERTa_GNN_256",
+    "n_gpu": 1,
+    "arch": {
+        "type": "bert_gnn_finalModel",
+        "args": {
+            "model": "allenai/cs_roberta_base",
+            "hidden_size": 768,
+            "num_class": 469,
+            "max_length":256
+        }
+    },
+    "data_loader": {
+        "type": "Papers",
+        "args": {
+            "dir": "./Dataset/data_pubmed_train.csv",
+            "data_dir": "./Dataset/data_pubmed_train.csv",
+            "batch_size": 16,
+            "type": "bert-base",
+            "model": "allenai/cs_roberta_base",
+            "num_classes": 469,
+            "shuffle": true,
+            "validation_split": 0.0,
+            "num_workers": 2,
+            "max_length": 256
+        }
+    },
+    "valid_data_loader": {
+        "type": "Papers",
+        "args": {
+            "dir": "./Dataset/data_pubmed_train.csv",
+            "data_dir": "./Dataset/data_pubmed_val.csv",
+            "batch_size": 16,
+            "type": "bert-base",
+            "model": "allenai/cs_roberta_base",
+            "num_classes": 469,
+            "shuffle": true,
+            "validation_split": 0.0,
+            "num_workers": 2,
+            "max_length": 256
+        }
+    },
+    "optimizer": {
+        "type": "AdamW",
+        "args": {
+            "lr": 2e-05
+        }
+    },
+    "loss": "cross_entropy",
+    "metrics": [
+        "accuracy",
+        "top_3_acc",
+        "top_5_acc",
+        "top_10_acc"
+    ],
+    "lr_scheduler": {
+        "type": "OneCycleLR",
+        "args": {
+            "max_lr": 2e-05,
+            "epochs": 5,
+            "steps_per_epoch":9847,
+            "div_factor": 2.5,
+            "pct_start": 0.1,
+            "anneal_strategy": "linear"
+        }
+    },
+    "trainer": {
+        "epochs": 5,
+        "save_dir": "saved/",
+        "save_period": 1,
+        "verbosity": 2,
+        "monitor": "min val_loss",
+        "early_stop": 3,
+        "tensorboard": true
+    }
+}
