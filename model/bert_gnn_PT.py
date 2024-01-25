@@ -1,12 +1,11 @@
 import torch.nn as nn
 import torch.nn.functional as F
+from base import BaseModel
+from transformers import AutoModel
 import torch
 import dgl
 from dgl.nn.pytorch import GATv2Conv
-from transformers import AutoModel, AutoTokenizer
-from base import BaseModel
-
-
+from transformers import AutoTokenizer
 
 
 class bert_gnn_PT(BaseModel):
@@ -17,6 +16,7 @@ class bert_gnn_PT(BaseModel):
         self.model = model
         self.hidden_size = hidden_size
         self.num_class = num_class
+        self.max_length = max_length
         self.device = device
 
         # Initialize the BERT model with specified configuration
@@ -28,15 +28,15 @@ class bert_gnn_PT(BaseModel):
             max_length=max_length
         ).to(self.device)
 
-        # Initialize tokenizer
+         # Initialize tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(self.model, do_lower_case=True)
 
         # Initialize the GNN Module
-        self.attentionGNN = AttentionModule(self.top_rate).to(self.device)
+        self.attentionGNN = AttentionModule(self.top_rate, self.device).to(self.device)
 
         # Initialize the Gating modules for lexical and semantic features
-        self.word_gate = GateModule(384).to(self.device)
-        self.semantic_gate = GateModule(384).to(self.device)
+        self.word_gate = GateModule(384, self.device).to(self.device)
+        self.semantic_gate = GateModule(384, self.device).to(self.device)
         
         # Define the fully connected layers for classification
         self.fc = nn.Sequential(
@@ -53,6 +53,7 @@ class bert_gnn_PT(BaseModel):
             nn.ReLU(),
         ).to(self.device)
 
+
     def forward(self, x, mask):
         """
         Forward pass of the model.
@@ -60,7 +61,6 @@ class bert_gnn_PT(BaseModel):
         Args:
             x (Tensor): Input data.
             mask (Tensor): Attention mask.
-
         Returns:
             Tensor: Model output.
         """
@@ -93,12 +93,16 @@ class AttentionModule(BaseModel):
 
     Args:
         top_rate (float): The top rate percentage used for selecting the top percentage of relations between nodes to use.
+        device (str): Device for computation.
     """
 
-    def __init__(self, top_rate):
+    def __init__(self, top_rate, device):
+        self.top_rate = top_rate
+        self.device = device
+
         super(AttentionModule, self).__init__()
-        self.word_gnn = AttentionGNNModule(top_rate).to(self.device)
-        self.semantic_gnn = AttentionGNNModule(top_rate).to(self.device)
+        self.word_gnn = AttentionGNNModule(self.top_rate, self.device).to(self.device)
+        self.semantic_gnn = AttentionGNNModule(self.top_rate, self.device).to(self.device)
         self.hs_word_trans = nn.Linear(768, 768).to(self.device)
         self.hs_semantic_trans = nn.Linear(768, 768).to(self.device)
 
@@ -132,6 +136,7 @@ class AttentionModule(BaseModel):
         semantic_output = self.semantic_gnn(semantic_hidden_state, semantic_attention, encoded_inputs, 'semantic', mask)
 
         return word_output, semantic_output
+    
 
 class AttentionGNNModule(nn.Module):
     """
@@ -139,16 +144,18 @@ class AttentionGNNModule(nn.Module):
 
     Args:
         top_rate (float): The top rate percentage used for selecting the top percentage of relations between nodes to use.
+        device (str): Device for computation.
     """
 
-    def __init__(self, top_rate):
+    def __init__(self, top_rate, device):
         super(AttentionGNNModule, self).__init__()
+        self.device = device
         self.top_rate = top_rate
 
-        # GATv2 convolution layer with LeakyReLU activation and residual connection
+        # GATv2 convolution layer with LeakyReLU activation
         self.conv1 = GATv2Conv(768, 768, num_heads=1, activation=nn.LeakyReLU(), residual=True).to(self.device)
         #self.conv2 = GATv2Conv(768,768, num_heads=1, activation=nn.LeakyReLU(), residual=True).to(self.device)
-        
+
         # Global Attention Pooling
         self.gate_nn = nn.Linear(768, 1).to(self.device)
         self.gap = dgl.nn.GlobalAttentionPooling(self.gate_nn).to(self.device)
@@ -188,7 +195,7 @@ class AttentionGNNModule(nn.Module):
 
         batch_graph = dgl.batch(sub_graphs).to(self.device)
 
-        # Apply GATv2 convolution layer with LeakyReLU activation
+        # Apply GATv2 convolution layer with LeakyReLU activation and residual connection
         result_node_embedding = self.conv1(batch_graph, batch_graph.ndata['h'])
         result_node_embedding = torch.flatten(result_node_embedding, start_dim=1)
 
@@ -210,8 +217,9 @@ class AttentionGNNModule(nn.Module):
         out = self.ln2(out)
 
         return out
-
-    def seq_to_graph(self, topk_value, topk_indice, hidden_state):
+    
+    
+    def seq_to_graph(self, topk_value, topk_indice, hidden_state, mask):
         """
         Converts a sequence to a graph based on values and indices.
 
@@ -223,7 +231,7 @@ class AttentionGNNModule(nn.Module):
         Returns:
             DGLGraph: The constructed DGL graph.
         """
-        # Filter out values and indices based on the attention mask excluding the padding tokens
+        # All values including padding tokens
         topk_values = topk_value[:]
         topk_indices = topk_indice[:]
         num_edges = topk_values.size(-1)
@@ -260,10 +268,12 @@ class GateModule(nn.Module):
 
     Args:
         dim_model (int): Dimensionality of the input models.
+        device (str): Device for computation.
     """
 
-    def __init__(self, dim_model):
+    def __init__(self, dim_model, device):
         super(GateModule, self).__init__()
+        self.device = device
         
         # Linear transformations for BERT and GNN inputs
         self.bert_trans = nn.Linear(dim_model, dim_model).to(self.device)
