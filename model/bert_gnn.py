@@ -32,11 +32,11 @@ class bert_gnn(BaseModel):
         self.tokenizer = AutoTokenizer.from_pretrained(self.model, do_lower_case=True)
 
         # Initialize the GNN Module
-        self.attentionGNN = AttentionModule(self.top_rate, device=device).to(device)
+        self.attentionGNN = AttentionModule(self.top_rate).to(self.device)
 
         # Initialize the Gating modules for lexical and semantic features
-        self.word_gate = GateModule(384, device=device).to(device)
-        self.semantic_gate = GateModule(384, device=device).to(device)
+        self.word_gate = GateModule(384).to(self.device)
+        self.semantic_gate = GateModule(384).to(self.device)
         
         # Define the fully connected layers for classification
         self.fc = nn.Sequential(
@@ -45,13 +45,13 @@ class bert_gnn(BaseModel):
             nn.LayerNorm(768),
             nn.Dropout(0.1),
             nn.Linear(768, num_class),
-        ).to(device)
+        ).to(self.device)
 
         # Further transformation layer for BERT pooler output
         self.bert_trans = nn.Sequential(
             nn.Linear(768, 384),
             nn.ReLU(),
-        ).to(device)
+        ).to(self.device)
 
 
     def forward(self, x, mask):
@@ -223,7 +223,6 @@ class AttentionGNNModule(nn.Module):
 
     Args:
         top_rate (float): The top rate percentage used for selecting the top percentage of relations between nodes to use.
-        device (str): Device for computation.
     """
 
     def __init__(self, top_rate):
@@ -346,15 +345,14 @@ class GateModule(nn.Module):
 
     Args:
         dim_model (int): Dimensionality of the input models.
-        device (str): Device for computation.
     """
 
-    def __init__(self, dim_model, device):
+    def __init__(self, dim_model):
         super(GateModule, self).__init__()
         
         # Linear transformations for BERT and GNN inputs
-        self.bert_trans = nn.Linear(dim_model, dim_model).to(device)
-        self.gnn_trans = nn.Linear(dim_model, dim_model).to(device)
+        self.bert_trans = nn.Linear(dim_model, dim_model).to(self.device)
+        self.gnn_trans = nn.Linear(dim_model, dim_model).to(self.device)
         
         # Sigmoid activation for gating
         self.activation = nn.Sigmoid()

@@ -32,11 +32,11 @@ class bert_gnn_PT(BaseModel):
         self.tokenizer = AutoTokenizer.from_pretrained(self.model, do_lower_case=True)
 
         # Initialize the GNN Module
-        self.attentionGNN = AttentionModule(self.top_rate, device=device).to(device)
+        self.attentionGNN = AttentionModule(self.top_rate).to(self.device)
 
         # Initialize the Gating modules for lexical and semantic features
-        self.word_gate = GateModule(384, device=device).to(device)
-        self.semantic_gate = GateModule(384, device=device).to(device)
+        self.word_gate = GateModule(384).to(self.device)
+        self.semantic_gate = GateModule(384).to(self.device)
         
         # Define the fully connected layers for classification
         self.fc = nn.Sequential(
@@ -45,13 +45,13 @@ class bert_gnn_PT(BaseModel):
             nn.LayerNorm(768),
             nn.Dropout(0.1),
             nn.Linear(768, num_class),
-        ).to(device)
+        ).to(self.device)
 
         # Further transformation layer for BERT pooler output
         self.bert_trans = nn.Sequential(
             nn.Linear(768, 384),
             nn.ReLU(),
-        ).to(device)
+        ).to(self.device)
 
     def forward(self, x, mask):
         """
@@ -139,28 +139,26 @@ class AttentionGNNModule(nn.Module):
 
     Args:
         top_rate (float): The top rate percentage used for selecting the top percentage of relations between nodes to use.
-        device (str): Device for computation.
     """
 
-    def __init__(self, top_rate, device):
+    def __init__(self, top_rate):
         super(AttentionGNNModule, self).__init__()
-        self.device = device
         self.top_rate = top_rate
 
         # GATv2 convolution layer with LeakyReLU activation and residual connection
-        self.conv1 = GATv2Conv(768, 768, num_heads=1, activation=nn.LeakyReLU(), residual=True).to(device)
+        self.conv1 = GATv2Conv(768, 768, num_heads=1, activation=nn.LeakyReLU(), residual=True).to(self.device)
         #self.conv2 = GATv2Conv(768,768, num_heads=1, activation=nn.LeakyReLU(), residual=True).to(self.device)
         
         # Global Attention Pooling
-        self.gate_nn = nn.Linear(768, 1).to(device)
-        self.gap = dgl.nn.GlobalAttentionPooling(self.gate_nn).to(device)
+        self.gate_nn = nn.Linear(768, 1).to(self.device)
+        self.gap = dgl.nn.GlobalAttentionPooling(self.gate_nn).to(self.device)
         
         # Dropout and normalization layers
-        self.dropout = nn.Dropout(0.1).to(device)
-        self.activation = nn.ReLU().to(device)
-        self.ln = nn.LayerNorm(768).to(device)
-        self.fc = nn.Linear(768, 384).to(device)
-        self.ln2 = nn.LayerNorm(384).to(device)
+        self.dropout = nn.Dropout(0.1).to(self.device)
+        self.activation = nn.ReLU().to(self.device)
+        self.ln = nn.LayerNorm(768).to(self.device)
+        self.fc = nn.Linear(768, 384).to(self.device)
+        self.ln2 = nn.LayerNorm(384).to(self.device)
 
     def forward(self, hidden_state, attention, encoded_inputs, type, mask):
         """
@@ -262,15 +260,14 @@ class GateModule(nn.Module):
 
     Args:
         dim_model (int): Dimensionality of the input models.
-        device (str): Device for computation.
     """
 
-    def __init__(self, dim_model, device):
+    def __init__(self, dim_model):
         super(GateModule, self).__init__()
         
         # Linear transformations for BERT and GNN inputs
-        self.bert_trans = nn.Linear(dim_model, dim_model).to(device)
-        self.gnn_trans = nn.Linear(dim_model, dim_model).to(device)
+        self.bert_trans = nn.Linear(dim_model, dim_model).to(self.device)
+        self.gnn_trans = nn.Linear(dim_model, dim_model).to(self.device)
         
         # Sigmoid activation for gating
         self.activation = nn.Sigmoid()
