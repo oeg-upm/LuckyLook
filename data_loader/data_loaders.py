@@ -2,7 +2,7 @@
 from base import BaseDataLoader
 import pandas as pd
 from torch.utils.data import Dataset
-from keras.utils import to_categorical
+from tensorflow.keras.utilskeras.utils import to_categorical
 from data_loader import CustomTokenize as ct
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.text import Tokenizer
