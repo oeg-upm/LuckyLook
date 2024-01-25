@@ -13,15 +13,15 @@
     "data_loader": {
         "type": "Papers",                                                               
         "args":{
-            "dir": "./Dataset/Complete/data_pymed_train.csv",
-            "data_dir": "./Dataset/Complete/data_pymed_train.csv",    
+            "dir": "./Dataset/data_pymed_train.csv",
+            "data_dir": "./Dataset/data_pymed_train.csv",    
             "batch_size": 16,                                                            
             "type": "bert-base",
             "model": "allenai/cs_roberta_base",
             "num_classes": 469,                                                           
             "shuffle": true,                                                            
             "validation_split": 0.0,                                                    
-            "num_workers": 2,
+            "num_workers": 1,
             "max_length": 512,
             "content": "title+keywords"                                                            
         }
@@ -29,15 +29,15 @@
     "valid_data_loader": {
         "type": "Papers",                                                               
         "args":{    
-            "dir": "./Dataset/Complete/data_pymed_train.csv",
-            "data_dir": "./Dataset/Complete/data_pymed_val.csv",      
+            "dir": "./Dataset/data_pymed_train.csv",
+            "data_dir": "./Dataset/data_pymed_val.csv",      
             "batch_size": 16,                                                            
             "type": "bert-base",
             "model": "allenai/cs_roberta_base",
             "num_classes": 469,                                                           
             "shuffle": true,                                                            
             "validation_split": 0.0,                                                    
-            "num_workers": 2,
+            "num_workers": 1,
             "max_length": 512,
             "content": "title+keywords"                                                            
         }
