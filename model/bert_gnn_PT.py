@@ -9,24 +9,15 @@ from base import BaseModel
 
 
 
-class bert_gnn_final_ST(BaseModel):
-    """
-    Description of the bert_gnn_final_ST class.
-    
-    Args:
-        model (str): The name of the pre-trained BERT model.
-        hidden_size (int): The hidden size for model layers.
-        num_class (int): The number of output classes.
-        max_length (int, optional): Maximum input sequence length for BERT model (default is 512).
-        device (str, optional): Device for computation (default is 'cuda').
-    """
+class bert_gnn_PT(BaseModel):
 
     def __init__(self, model, hidden_size, num_class, max_length=512, device='cuda'):
-        super(bert_gnn_final_ST, self).__init__()
+        super(bert_gnn_PT, self).__init__()
         self.top_rate = 0.05
         self.model = model
         self.hidden_size = hidden_size
         self.num_class = num_class
+        self.device = device
 
         # Initialize the BERT model with specified configuration
         self.bert = AutoModel.from_pretrained(
@@ -35,7 +26,7 @@ class bert_gnn_final_ST(BaseModel):
             output_attentions=True,
             output_hidden_states=True,
             max_length=max_length
-        ).to(device)
+        ).to(self.device)
 
         # Initialize tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(self.model, do_lower_case=True)
@@ -73,7 +64,7 @@ class bert_gnn_final_ST(BaseModel):
         Returns:
             Tensor: Model output.
         """
-         # Pass input through the BERT model
+        # Pass input through the BERT model
         output = self.bert(x, mask)
         bert_out = output['pooler_output']
 
@@ -102,15 +93,14 @@ class AttentionModule(BaseModel):
 
     Args:
         top_rate (float): The top rate percentage used for selecting the top percentage of relations between nodes to use.
-        device (str): Device for computation.
     """
 
-    def __init__(self, top_rate, device):
+    def __init__(self, top_rate):
         super(AttentionModule, self).__init__()
-        self.word_gnn = AttentionGNNModule(top_rate, device=device).to(device)
-        self.semantic_gnn = AttentionGNNModule(top_rate, device=device).to(device)
-        self.hs_word_trans = nn.Linear(768, 768).to(device)
-        self.hs_semantic_trans = nn.Linear(768, 768).to(device)
+        self.word_gnn = AttentionGNNModule(top_rate).to(self.device)
+        self.semantic_gnn = AttentionGNNModule(top_rate).to(self.device)
+        self.hs_word_trans = nn.Linear(768, 768).to(self.device)
+        self.hs_semantic_trans = nn.Linear(768, 768).to(self.device)
 
     def forward(self, output, encoded_inputs, mask):
         """
@@ -129,11 +119,13 @@ class AttentionModule(BaseModel):
         word_attention = torch.stack(output['attentions'][:3], dim=4).max(dim=4)[0].mean(dim=1)
         word_hidden_state = self.hs_word_trans(torch.stack(output['hidden_states'][:4], dim=3).transpose(-2, -1)
                                         ).transpose(-2, -1).max(dim=3)[0]
+        #word_hidden_state = torch.stack(output['hidden_states'][:3], dim=3).max(dim=3)[0]
         
-        # Extract semantic-level attention and hidden states from the last 3 layers (Semantic Representation)
+        # Extract semantic-level attention and hidden states from the last 3 layers except final output layer (Semantic Representation)
         semantic_attention = torch.stack(output['attentions'][9:12], dim=4).max(dim=4)[0].mean(dim=1)
         semantic_hidden_state = self.hs_semantic_trans(torch.stack(output['hidden_states'][9:12], dim=3).transpose(-2, -1)
                                                 ).transpose(-2, -1).max(dim=3)[0]
+        #semantic_hidden_state = torch.stack(output['hidden_states'][9:12], dim=3).max(dim=3)[0]
 
         # Apply GNN modules to obtain word and semantic representations
         word_output = self.word_gnn(word_hidden_state, word_attention, encoded_inputs, 'word', mask)
@@ -155,8 +147,9 @@ class AttentionGNNModule(nn.Module):
         self.device = device
         self.top_rate = top_rate
 
-        # GATv2 convolution layer with LeakyReLU activation
+        # GATv2 convolution layer with LeakyReLU activation and residual connection
         self.conv1 = GATv2Conv(768, 768, num_heads=1, activation=nn.LeakyReLU(), residual=True).to(device)
+        #self.conv2 = GATv2Conv(768,768, num_heads=1, activation=nn.LeakyReLU(), residual=True).to(self.device)
         
         # Global Attention Pooling
         self.gate_nn = nn.Linear(768, 1).to(device)
@@ -204,6 +197,13 @@ class AttentionGNNModule(nn.Module):
         # Update Embedding
         batch_graph.ndata['h'] = result_node_embedding
 
+        ## Apply 2 GATv2 convolution layer with LeakyReLU activation
+        #result_node_embedding = self.conv2(batch_graph, batch_graph.ndata['h'])
+        #result_node_embedding = torch.flatten(result_node_embedding, start_dim=1)
+
+        ##Update Embedding
+        #batch_graph.ndata['h'] = result_node_embedding
+
         # Apply Graph Attention Pooling
         out, node_attention = self.gap(batch_graph, batch_graph.ndata['h'], get_attention=True)
 
@@ -213,7 +213,7 @@ class AttentionGNNModule(nn.Module):
 
         return out
 
-    def seq_to_graph(self, topk_value, topk_indice, hidden_state, mask):
+    def seq_to_graph(self, topk_value, topk_indice, hidden_state):
         """
         Converts a sequence to a graph based on values and indices.
 
@@ -221,7 +221,6 @@ class AttentionGNNModule(nn.Module):
             values (Tensor): Values for sub-graph selection.
             indices (Tensor): Indices for sub-graph selection.
             hidden_state (Tensor): Hidden state of the input.
-            mask (Tensor): Attention mask.
 
         Returns:
             DGLGraph: The constructed DGL graph.

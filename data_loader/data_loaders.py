@@ -12,7 +12,6 @@ import torch
 import itertools
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from transformers import AutoTokenizer
-from nltk.tokenize import word_tokenize
 import sys
 
 

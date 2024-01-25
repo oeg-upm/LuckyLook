@@ -1,2 +1,2 @@
 # LuckyLook
-Software for searching scientific journals
+Software for searching scientific journal recommendation

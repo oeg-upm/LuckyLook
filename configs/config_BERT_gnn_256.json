@@ -1,19 +1,20 @@
 {
-    "name": "BERT_GNN_ST",
+    "name": "BERT_GNN_256",
     "n_gpu": 1,
     "arch": {
-        "type": "bert_gnn_finalModel_ST",
+        "type": "bert_gnnModel",
         "args": {
             "model": "bert-base-uncased",
             "hidden_size": 768,
-            "num_class": 469
+            "num_class": 469,
+            "max_length":256
         }
     },
     "data_loader": {
         "type": "Papers",
         "args": {
-            "dir": "./Dataset/data_pubmed_train.csv",
-            "data_dir": "./Dataset/data_pubmed_train.csv",
+            "dir": "./Dataset/Complete/data_pymed_train.csv",
+            "data_dir": "./Dataset/Complete/data_pymed_train.csv",
             "batch_size": 16,
             "type": "bert-base",
             "model": "bert-base-uncased",
@@ -21,14 +22,14 @@
             "shuffle": true,
             "validation_split": 0.0,
             "num_workers": 2,
-            "max_length": 512
+            "max_length": 256
         }
     },
     "valid_data_loader": {
         "type": "Papers",
         "args": {
-            "dir": "./Dataset/data_pubmed_train.csv",
-            "data_dir": "./Dataset/data_pubmed_val.csv",
+            "dir": "./Dataset/Complete/data_pymed_train.csv",
+            "data_dir": "./Dataset/Complete/data_pymed_val.csv",
             "batch_size": 16,
             "type": "bert-base",
             "model": "bert-base-uncased",
@@ -36,7 +37,7 @@
             "shuffle": true,
             "validation_split": 0.0,
             "num_workers": 2,
-            "max_length": 512
+            "max_length": 256
         }
     },
     "optimizer": {
@@ -57,7 +58,7 @@
         "args": {
             "max_lr": 2e-05,
             "epochs": 5,
-            "steps_per_epoch":9847,
+            "steps_per_epoch": 31508,
             "div_factor": 2.5,
             "pct_start": 0.1,
             "anneal_strategy": "linear"

@@ -2,7 +2,8 @@ import streamlit as st
 import torch
 import joblib
 import pandas as pd
-from model.bert_gnn_final import bert_gnn_final
+from model.bert_gnn import bert_gnn
+from model.bert_gnn_PT import bert_gnn_PT
 from transformers import AutoTokenizer
 from sklearn.preprocessing import LabelEncoder
 import torch.nn.functional as F
@@ -15,8 +16,8 @@ def load_model():
     posix_backup = pathlib.PosixPath
     try:
         pathlib.PosixPath = pathlib.WindowsPath
-        model = bert_gnn_final("roberta-base", 768, 469, device=device).to(device)
-        checkpoint = torch.load('./saved/models/RoBERTa_GNN/model_best.pth', map_location=torch.device(device))
+        model = bert_gnn_PT("allenai/cs_roberta_base", 768, 469, device=device).to(device)
+        checkpoint = torch.load('./saved/models/csRoBERTa_GNN_PT/model_best_csRoBERTa_GNN_PT.pth', map_location=torch.device(device))
         state_dict = checkpoint['state_dict']
         model.load_state_dict(state_dict, strict=False)
         model.eval()
@@ -27,7 +28,7 @@ def load_model():
 @st.cache_data
 def load_labels():
     # prepare labels
-    label_encoder = joblib.load('./saved/models/csRoBERTa_GNN/label_encoder.pkl')
+    label_encoder = joblib.load('label_encoder.pkl')
     return label_encoder
 
 @st.cache_data
@@ -40,7 +41,7 @@ def read_unique_journals(file_path):
 st.title("PubMed Journal Recommender")
 
 
-st.write("Accuracy: (ACC@1=0.765, ACC@3=0.916, ACC@5=0.951, ACC@10=0.976)")
+st.write("Accuracy: (ACC@1=0.771, ACC@3=0.918, ACC@5=0.951, ACC@10=0.977)")
 items = read_unique_journals('unique_journals.txt')
 
 # Sidebar
@@ -61,7 +62,7 @@ with st.form("Predict Journal"):
     submitted = st.form_submit_button("Submit")
     if submitted:
         with torch.no_grad():
-            doc = title + ' ' + abstract + ' ' + (keyword if keyword else '')
+            doc = title + ' ' + abstract + ' ' + (keyword if keyword else ' ')
             tokenizer = AutoTokenizer.from_pretrained("roberta-base", do_lower_case=True)
             encoding = tokenizer(doc,truncation=True,padding="max_length",max_length=512)
             encoding = {k: torch.tensor(v) for k, v in encoding.items()}

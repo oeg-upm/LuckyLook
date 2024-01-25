@@ -1,9 +1,9 @@
 {
-    "name": "csRoBERTa_GNN_keywords",          
+    "name": "csRoBERTa_GNN_title+abstract",          
     "n_gpu": 1,                     
 
     "arch": {
-        "type": "bert_gnn_finalModel",         
+        "type": "bert_gnnModel",         
         "args": {
             "model": "allenai/cs_roberta_base",
             "hidden_size": 768,
@@ -13,8 +13,8 @@
     "data_loader": {
         "type": "Papers",                                                               
         "args":{
-            "dir": "/Dataset/Complete/data_pubmed_train.csv",
-            "data_dir": "/Dataset/Complete/data_pubmed_train.csv",    
+            "dir": "./Dataset/Complete/data_pymed_train.csv",
+            "data_dir": "./Dataset/Complete/data_pymed_train.csv",    
             "batch_size": 16,                                                            
             "type": "bert-base",
             "model": "allenai/cs_roberta_base",
@@ -22,15 +22,15 @@
             "shuffle": true,                                                            
             "validation_split": 0.0,                                                    
             "num_workers": 2,
-            "max_length": 256,
-            "content": "keywords"                                                            
+            "max_length": 512,
+            "content": "title+abstract"                                                            
         }
     },
     "valid_data_loader": {
         "type": "Papers",                                                               
         "args":{    
-            "dir": "/Dataset/Complete/data_pubmed_train.csv",
-            "data_dir": "/Dataset/Complete/data_pubmed_val.csv",      
+            "dir": "./Dataset/Complete/data_pymed_train.csv",
+            "data_dir": "./Dataset/Complete/data_pymed_val.csv",      
             "batch_size": 16,                                                            
             "type": "bert-base",
             "model": "allenai/cs_roberta_base",
@@ -38,8 +38,8 @@
             "shuffle": true,                                                            
             "validation_split": 0.0,                                                    
             "num_workers": 2,
-            "max_length": 256,
-            "content": "keywords"                                                            
+            "max_length": 512,
+            "content": "title+abstract"                                                            
         }
     },
     "optimizer": {
@@ -53,11 +53,11 @@
         "accuracy",  "top_3_acc", "top_5_acc", "top_10_acc"          
     ],
     "lr_scheduler": {
-        "type": "OneCycleLR",               
+        "type": "OneCycleLR",
         "args": {
-            "max_lr": 2e-5,
+            "max_lr": 2e-05,
             "epochs": 5,
-            "steps_per_epoch": 2377,
+            "steps_per_epoch": 31508,
             "div_factor": 2.5,
             "pct_start": 0.1,
             "anneal_strategy": "linear"

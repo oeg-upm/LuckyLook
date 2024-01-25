@@ -57,7 +57,7 @@
         "args": {
             "max_lr": 2e-05,
             "epochs": 5,
-            "steps_per_epoch":9847,
+            "steps_per_epoch":31508,
             "div_factor": 2.5,
             "pct_start": 0.1,
             "anneal_strategy": "linear"

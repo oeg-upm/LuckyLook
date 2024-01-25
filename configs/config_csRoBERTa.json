@@ -13,8 +13,8 @@
     "data_loader": {
         "type": "Papers",                                                               
         "args":{
-            "dir": "./Dataset/data_pubmed_train.csv",
-            "data_dir": "./Dataset/data_pubmed_train.csv",    
+            "dir": "./Dataset/Complete/data_pymed_train.csv",
+            "data_dir": "./Dataset/Complete/data_pymed_train.csv",    
             "batch_size": 16,                                                            
             "type": "bert-base",
             "model": "allenai/cs_roberta_base",
@@ -28,8 +28,8 @@
     "valid_data_loader": {
         "type": "Papers",                                                               
         "args":{    
-            "dir": "./Dataset/data_pubmed_train.csv",
-            "data_dir": "./Dataset/data_pubmed_val.csv",      
+            "dir": "./Dataset/Complete/data_pymed_train.csv",
+            "data_dir": "./Dataset/Complete/data_pymed_val.csv",      
             "batch_size": 16,                                                            
             "type": "bert-base",
             "model": "allenai/cs_roberta_base",
@@ -58,7 +58,7 @@
         "args": {
             "max_lr": 2e-05,
             "epochs": 5,
-            "steps_per_epoch": 9847,
+            "steps_per_epoch": 31508,
             "div_factor": 2.5,
             "pct_start": 0.1,
             "anneal_strategy": "linear"

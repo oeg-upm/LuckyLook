@@ -1,6 +1,7 @@
 """
 This python script will extract all the information in pubmed using the pymed API of each article 
 of the database PubMedAKE.
+Download PubMedAKE data set from: https://zenodo.org/records/6330817 train.json, validate.json and test.json
 
 For each 10000 articles save it inside a csv as:
 data_pubmed_index1-index2.csv
@@ -175,6 +176,7 @@ if __name__ == "__main__":
 
     # READ PubMedAKE data set
     # PubMedAKE data set: pmid, abstract, title, keywords_in and keywords_not_in
+    # Download PubMedAKE data set from: https://zenodo.org/records/6330817 train.json, validate.json and test.json
 
     data = pubmedake.read_pubmedake("./PubMedAKE/" + sys.argv[1] + ".json")
 
