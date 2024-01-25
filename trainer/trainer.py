@@ -4,8 +4,8 @@ from torchvision.utils import make_grid
 from base import BaseTrainer
 from utils import inf_loop, MetricTracker
 from model.bert_base import bert_base
-from model.bert_gnn_final import bert_gnn_final
-from model.bert_gnn_final_ST import bert_gnn_final_ST
+from model.bert_gnn import bert_gnn
+from model.bert_gnn_PT import bert_gnn_PT
 
 
 class Trainer(BaseTrainer):
@@ -43,7 +43,7 @@ class Trainer(BaseTrainer):
         self.model.train()
         self.train_metrics.reset()
         for batch_idx, (data, target) in enumerate(self.data_loader):
-            if isinstance(self.model, bert_base) or isinstance(self.model, bert_gnn_final) or isinstance(self.model, bert_gnn_final_ST):
+            if isinstance(self.model, bert_base) or isinstance(self.model, bert_gnn) or isinstance(self.model, bert_gnn_PT):
                 input_ids = data['input_ids']
                 mask = data['attention_mask']
                 input_ids, mask, target = input_ids.to(self.device), mask.to(self.device), target.to(self.device)
@@ -93,7 +93,7 @@ class Trainer(BaseTrainer):
         self.valid_metrics.reset()
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(self.valid_data_loader):
-                if isinstance(self.model, bert_base) or isinstance(self.model, bert_gnn_final) or isinstance(self.model, bert_gnn_final_ST):
+                if isinstance(self.model, bert_base) or isinstance(self.model, bert_gnn) or isinstance(self.model,bert_gnn_PT):
                     input_ids = data['input_ids']
                     mask = data['attention_mask']
                     input_ids, mask, target = input_ids.to(self.device), mask.to(self.device), target.to(self.device)

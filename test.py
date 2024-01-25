@@ -7,8 +7,8 @@ import model.metric as module_metric
 import model.models as module_arch
 from parse_config import ConfigParser
 from model.bert_base import bert_base
-from model.bert_gnn_final import bert_gnn_final
-from model.bert_gnn_final_ST import bert_gnn_final_ST
+from model.bert_gnn import bert_gnn
+from model.bert_gnn_PT import bert_gnn_PT
 
 
 def main(config):
@@ -63,7 +63,7 @@ def main(config):
 
     with torch.no_grad():
         for i, (data, target) in enumerate(tqdm(data_loader)):
-            if isinstance(model, bert_base) or isinstance(model, bert_gnn) or isinstance(model, bert_gnn_final) or isinstance(model, bert_gnn_final_ST):
+            if isinstance(model, bert_base) or isinstance(model, bert_gnn) or isinstance(model, bert_gnn_PT):
                 input_ids = data['input_ids']
                 mask = data['attention_mask']
                 input_ids, mask, target = input_ids.to(device), mask.to(device), target.to(device)
