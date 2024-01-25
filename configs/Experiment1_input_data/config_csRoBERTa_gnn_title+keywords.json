@@ -21,7 +21,7 @@
             "num_classes": 469,                                                           
             "shuffle": true,                                                            
             "validation_split": 0.0,                                                    
-            "num_workers": 2,
+            "num_workers": 1,
             "max_length": 512,
             "content": "title+keywords"                                                            
         }
@@ -37,7 +37,7 @@
             "num_classes": 469,                                                           
             "shuffle": true,                                                            
             "validation_split": 0.0,                                                    
-            "num_workers": 2,
+            "num_workers": 1,
             "max_length": 512,
             "content": "title+keywords"                                                            
         }
