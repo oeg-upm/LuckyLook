@@ -12,8 +12,8 @@
     "data_loader": {
         "type": "Papers",
         "args": {
-            "dir": "./Dataset/Complete/data_pymed_train.csv",
-            "data_dir": "./Dataset/Complete/data_pymed_train.csv",
+            "dir": "./Dataset/data_pymed_train.csv",
+            "data_dir": "./Dataset/data_pymed_train.csv",
             "batch_size": 16,
             "type": "bert-base",
             "model": "allenai/cs_roberta_base",
@@ -27,8 +27,8 @@
     "valid_data_loader": {
         "type": "Papers",
         "args": {
-            "dir": "./Dataset/Complete/data_pymed_train.csv",
-            "data_dir": "./Dataset/Complete/data_pymed_val.csv",
+            "dir": "./Dataset/data_pymed_train.csv",
+            "data_dir": "./Dataset/data_pymed_val.csv",
             "batch_size": 16,
             "type": "bert-base",
             "model": "allenai/cs_roberta_base",

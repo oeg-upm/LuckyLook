@@ -12,8 +12,8 @@
     "data_loader": {                                                    # Training data loader.
         "type": "Papers",                                               # Selecting data loader.    
         "args": {
-            "dir": "/Dataset/Complete/data_pymed_train.csv",            # Dataset path.     
-            "data_dir": "/Dataset/Complete/data_pymed_train.csv",       # Dataset path for training.
+            "dir": "/Dataset/data_pymed_train.csv",            # Dataset path.     
+            "data_dir": "/Dataset/data_pymed_train.csv",       # Dataset path for training.
             "batch_size": 16,                                           # Batch size.
             "type": "bert-base",                                        # Embedding type.
             "model": "bert-base-uncased",                               # Model name.
@@ -27,8 +27,8 @@
     "valid_data_loader": {                                              # Validation data loader.
         "type": "Papers",                                                   
         "args": {
-            "dir": "/Dataset/Complete/data_pymed_train.csv",
-            "data_dir": "/Dataset/Complete/data_pymed_val.csv",         # Dataset path for validation.        
+            "dir": "/Dataset/data_pymed_train.csv",
+            "data_dir": "/Dataset/data_pymed_val.csv",         # Dataset path for validation.        
             "batch_size": 16,
             "type": "bert-base",
             "model": "bert-base-uncased",
