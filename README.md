@@ -13,7 +13,7 @@ to provide a better recommendation.
 
 ## Usage
 
-JSON files for configuration are located in the `configs/` folder. These configuration files contain parameters and settings for training the model.
+Configuration JSON files, which include parameters and settings for model training, are stored in the `configs/` directory.
 
 ### Training
 
