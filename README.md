@@ -19,12 +19,16 @@ Configuration JSON files, which include parameters and settings for model traini
 
 To train the model, run:
 
+```python
 python train.py --config configs/<config_file>.json
+```
 
 ### Testing
 
 For testing, specify the checkpoint directory:
 
+```python
 python test.py --resume path/to/checkpoint
+```
 
 ## Citation
