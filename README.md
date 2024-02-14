@@ -1,6 +1,6 @@
 # LuckyLook
 
-LuckyLook is a tool designed for recommending scientific journals for researchers looking to publish their work. It uses a Transformer model with additional graph-level information
+LuckyLook is a tool designed for recommending PubMed scientific journals for researchers looking to publish their work. It uses a Transformer model with additional graph-level information
 to provide a better recommendation.
 
 ## Installation
