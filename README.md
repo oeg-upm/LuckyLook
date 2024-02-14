@@ -31,4 +31,12 @@ For testing, specify the checkpoint directory:
 python test.py --resume path/to/checkpoint
 ```
 
+## Streamlit web application
+
+## Usage
+
+```python
+streamlit run LuckyLook.py
+```
+
 ## Citation
