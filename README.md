@@ -40,3 +40,7 @@ streamlit run LuckyLook.py
 ```
 
 ## Citation
+
+## Acknowledgements
+
+- DGC-BERT: https://github.com/ECNU-Text-Computing/DGC-BERT
