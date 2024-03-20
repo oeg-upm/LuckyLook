@@ -7,6 +7,8 @@ import dgl
 from dgl.nn.pytorch import GATv2Conv
 from transformers import AutoTokenizer
 
+# Adapted from DGC-BERT
+# Source: https://github.com/ECNU-Text-Computing/DGC-BERT
 
 class bert_gnn(BaseModel):
 
